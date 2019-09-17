@@ -88,6 +88,7 @@ void setupFirebase() {
   }
 
   Firebase.setStreamCallback(firebaseDataRead, streamCallback, streamTimeoutCallback);
+  Firebase.setBool(firebaseDataWrite, lightControlPath, false);
 }
 
 void connectToWifi() {
@@ -102,6 +103,6 @@ void connectToWifi() {
 }
 
 void setupPins() {
-    pinMode(LIGHT_SWITCH_INPUT, INPUT);
-    pinMode(LIGHT_OUTPUT, OUTPUT);
+  pinMode(LIGHT_SWITCH_INPUT, INPUT);
+  pinMode(LIGHT_OUTPUT, OUTPUT);
 }
