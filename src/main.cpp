@@ -58,9 +58,9 @@ void streamCallback(StreamData data) {
   Serial.println("------------------------------------");
   Serial.println("LIGHT STATUS CHANGED...");
   Serial.println("STREAM PATH: " + data.streamPath());
+  Serial.println("DATA TYPE: " + data.dataType());
   if (data.dataType() == "boolean") {
     lighFirebaseState = data.boolData();
-
     Serial.print("VALUE: ");
     Serial.println(data.boolData() == 1 ? "true" : "false");
 
@@ -82,7 +82,7 @@ void setupFirebase() {
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
   Firebase.reconnectWiFi(true);
 
-  if (!Firebase.beginStream(firebaseDataRead, firebasePath)) {
+  if (!Firebase.beginStream(firebaseDataRead, lightControlPath)) {
     Serial.println("------------------------------------");
     Serial.println("Can't begin stream connection - REASON: " + firebaseDataRead.errorReason());
   }
