@@ -4,7 +4,7 @@
 FirebaseData firebaseDataRead;
 FirebaseData firebaseDataWrite;
 
-String firebasePath = "/rooms/my_room/light";
+String firebasePath = "/rooms/bedroom/light";
 String lightControlPath = firebasePath + "/enabled";
 
 int lighFirebaseState = LOW;
