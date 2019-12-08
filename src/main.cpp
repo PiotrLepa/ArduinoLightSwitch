@@ -4,7 +4,7 @@
 FirebaseData firebaseDataRead;
 FirebaseData firebaseDataWrite;
 
-String firebasePath = "/rooms/my_room/light";
+String firebasePath = "/rooms/bedroom/light";
 String lightControlPath = firebasePath + "/enabled";
 
 int lighFirebaseState = LOW;
@@ -58,9 +58,9 @@ void streamCallback(StreamData data) {
   Serial.println("------------------------------------");
   Serial.println("LIGHT STATUS CHANGED...");
   Serial.println("STREAM PATH: " + data.streamPath());
+  Serial.println("DATA TYPE: " + data.dataType());
   if (data.dataType() == "boolean") {
     lighFirebaseState = data.boolData();
-
     Serial.print("VALUE: ");
     Serial.println(data.boolData() == 1 ? "true" : "false");
 
@@ -82,12 +82,13 @@ void setupFirebase() {
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
   Firebase.reconnectWiFi(true);
 
-  if (!Firebase.beginStream(firebaseDataRead, firebasePath)) {
+  if (!Firebase.beginStream(firebaseDataRead, lightControlPath)) {
     Serial.println("------------------------------------");
     Serial.println("Can't begin stream connection - REASON: " + firebaseDataRead.errorReason());
   }
 
   Firebase.setStreamCallback(firebaseDataRead, streamCallback, streamTimeoutCallback);
+  Firebase.setBool(firebaseDataWrite, lightControlPath, false);
 }
 
 void connectToWifi() {
@@ -102,6 +103,6 @@ void connectToWifi() {
 }
 
 void setupPins() {
-    pinMode(LIGHT_SWITCH_INPUT, INPUT);
-    pinMode(LIGHT_OUTPUT, OUTPUT);
+  pinMode(LIGHT_SWITCH_INPUT, INPUT);
+  pinMode(LIGHT_OUTPUT, OUTPUT);
 }
