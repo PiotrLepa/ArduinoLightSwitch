@@ -11,7 +11,7 @@ int lighFirebaseState = LOW;
 int lightSwitchState = LOW;
 int previuosLightSwitchState = LOW;
 
-int inputCount = 0;
+int inputRepetitionCounter = 0;
 
 unsigned long readInputDelayMillis = 0;
 
@@ -29,14 +29,14 @@ void loop() {
     int currentLightSwitchState = !digitalRead(LIGHT_SWITCH_INPUT);
 
     if (currentLightSwitchState == previuosLightSwitchState) {
-      inputCount++;
+      inputRepetitionCounter++;
     } else {
-      inputCount = 0;
+      inputRepetitionCounter = 0;
+      previuosLightSwitchState = currentLightSwitchState;
     }
-    previuosLightSwitchState = currentLightSwitchState;
 
-    if (lightSwitchState != currentLightSwitchState && inputCount >= 3) {
-      inputCount = 0;
+    if (lightSwitchState != currentLightSwitchState && inputRepetitionCounter >= 3) {
+      inputRepetitionCounter = 0;
       lightSwitchState = currentLightSwitchState;
       saveLightStateToFirebase();
     }
@@ -69,7 +69,8 @@ void streamCallback(StreamData data) {
 }
 
 void setLightState(bool enabled) {
-  digitalWrite(LIGHT_OUTPUT, enabled);
+  // use ! operator beacuse relay is enabled by LOW status
+  digitalWrite(LIGHT_OUTPUT, !enabled);
 }
 
 void streamTimeoutCallback(bool timeout) {
