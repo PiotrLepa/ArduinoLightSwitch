@@ -7,7 +7,7 @@ FirebaseData firebaseDataWrite;
 String firebasePath = "/rooms/bedroom/light";
 String lightControlPath = firebasePath + "/enabled";
 
-int lighFirebaseState = LOW;
+int lightFirebaseState = LOW;
 int lightSwitchState = LOW;
 int previuosLightSwitchState = LOW;
 
@@ -44,7 +44,7 @@ void loop() {
 }
 
 void saveLightStateToFirebase() {
-  if (Firebase.setBool(firebaseDataWrite, lightControlPath, !lighFirebaseState)) {
+  if (Firebase.setBool(firebaseDataWrite, lightControlPath, !lightFirebaseState)) {
     Serial.println("------------------------------------");
     Serial.println("SAVED LIGHT STATUS");
     Serial.print("VALUE: ");
@@ -60,17 +60,17 @@ void streamCallback(StreamData data) {
   Serial.println("STREAM PATH: " + data.streamPath());
   Serial.println("DATA TYPE: " + data.dataType());
   if (data.dataType() == "boolean") {
-    lighFirebaseState = data.boolData();
+    // use ! operator beacuse relay is enabled by LOW status
+    lightFirebaseState = !data.boolData();
     Serial.print("VALUE: ");
     Serial.println(data.boolData() == 1 ? "true" : "false");
 
-    setLightState(lighFirebaseState);
+    setLightState(lightFirebaseState);
   }
 }
 
 void setLightState(bool enabled) {
-  // use ! operator beacuse relay is enabled by LOW status
-  digitalWrite(LIGHT_OUTPUT, !enabled);
+  digitalWrite(LIGHT_OUTPUT, enabled);
 }
 
 void streamTimeoutCallback(bool timeout) {
