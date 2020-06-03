@@ -7,11 +7,11 @@ FirebaseData firebaseDataWrite;
 String firebasePath = "/rooms/bedroom/light";
 String lightControlPath = firebasePath + "/enabled";
 
-int lighFirebaseState = LOW;
+int lightFirebaseState = LOW;
 int lightSwitchState = LOW;
 int previuosLightSwitchState = LOW;
 
-int inputCount = 0;
+int inputRepetitionCounter = 0;
 
 unsigned long readInputDelayMillis = 0;
 
@@ -29,14 +29,14 @@ void loop() {
     int currentLightSwitchState = !digitalRead(LIGHT_SWITCH_INPUT);
 
     if (currentLightSwitchState == previuosLightSwitchState) {
-      inputCount++;
+      inputRepetitionCounter++;
     } else {
-      inputCount = 0;
+      inputRepetitionCounter = 0;
+      previuosLightSwitchState = currentLightSwitchState;
     }
-    previuosLightSwitchState = currentLightSwitchState;
 
-    if (lightSwitchState != currentLightSwitchState && inputCount >= 3) {
-      inputCount = 0;
+    if (lightSwitchState != currentLightSwitchState && inputRepetitionCounter >= 3) {
+      inputRepetitionCounter = 0;
       lightSwitchState = currentLightSwitchState;
       saveLightStateToFirebase();
     }
@@ -44,7 +44,7 @@ void loop() {
 }
 
 void saveLightStateToFirebase() {
-  if (Firebase.setBool(firebaseDataWrite, lightControlPath, !lighFirebaseState)) {
+  if (Firebase.setBool(firebaseDataWrite, lightControlPath, !lightFirebaseState)) {
     Serial.println("------------------------------------");
     Serial.println("SAVED LIGHT STATUS");
     Serial.print("VALUE: ");
@@ -60,11 +60,12 @@ void streamCallback(StreamData data) {
   Serial.println("STREAM PATH: " + data.streamPath());
   Serial.println("DATA TYPE: " + data.dataType());
   if (data.dataType() == "boolean") {
-    lighFirebaseState = data.boolData();
+    // use ! operator beacuse relay is enabled by LOW status
+    lightFirebaseState = !data.boolData();
     Serial.print("VALUE: ");
     Serial.println(data.boolData() == 1 ? "true" : "false");
 
-    setLightState(lighFirebaseState);
+    setLightState(lightFirebaseState);
   }
 }
 
